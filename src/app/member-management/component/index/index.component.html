@@ -1,0 +1,68 @@
+<div class="page-container">
+  <div *ngIf="service.showOrgSelect; else memberSelect">
+    <h3 class="organization-selector-header header">組織單位</h3>
+    <dx-tree-view
+      class="organization-selector"
+      [items]="organization"
+      [width]="300"
+      [searchEnabled]="true"
+      [useNativeScrolling]="false"
+      searchMode="contains"
+    ></dx-tree-view>
+  </div>
+  <ng-template #memberSelect>
+    <div>
+      <h3 class="organization-selector-header header">人員</h3>
+    </div>
+  </ng-template>
+
+  <div>
+    <dx-data-grid
+      id="gridContainer"
+      [customizeColumns]="customizeColumns"
+      [dataSource]="dataSource"
+      keyExpr="id"
+      [showBorders]="true"
+    >
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div *dxTemplate>
+            <h3 class="header member-table-header">[xx組織]成員</h3>
+          </div>
+        </dxi-item>
+        <dxi-item location="after">
+          <div *dxTemplate>
+            <dx-button text="創建成員" width="136"> </dx-button>
+          </div>
+        </dxi-item>
+        <dxi-item name="searchPanel"></dxi-item>
+      </dxo-toolbar>
+      <dxo-search-panel [visible]="true"></dxo-search-panel>
+      <dxo-scrolling rowRenderingMode="virtual"> </dxo-scrolling>
+      <dxo-paging [pageSize]="10"> </dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        allowedPageSizes
+        displayMode="full"
+        [showPageSizeSelector]="true"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      >
+      </dxo-pager>
+    </dx-data-grid>
+    <hr />
+    <div class="right-part-bottom">
+      <div>
+        <div>
+          <h3 class="header">[xx成員]持有卡片</h3>
+        </div>
+        <dx-list
+          [width]="400"
+          [dataSource]="cards"
+          displayExpr="Name"
+          [allowItemDeleting]="true"
+        ></dx-list>
+      </div>
+    </div>
+  </div>
+</div>
