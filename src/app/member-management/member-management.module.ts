@@ -7,6 +7,9 @@ import {
   DxDataGridModule,
   DxListModule,
   DxButtonModule,
+  DxDrawerModule,
+  DxTabsModule,
+  DxTabPanelModule,
 } from 'devextreme-angular';
 
 @NgModule({
@@ -18,6 +21,9 @@ import {
     DxDataGridModule,
     DxListModule,
     DxButtonModule,
+    DxDrawerModule,
+    DxTabsModule,
+    DxTabPanelModule,
   ],
   exports: [IndexComponent],
 })

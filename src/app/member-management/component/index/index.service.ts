@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface OrganizationUnit {
   id: string;
@@ -33,88 +34,88 @@ export interface Card {
 const organization: OrganizationUnit[] = [
   {
     id: '1',
-    text: 'Stores',
+    text: '組織1',
     expanded: true,
     items: [
       {
         id: '1_1',
-        text: 'Super Mart of the West',
+        text: '組織1-1',
         expanded: true,
         items: [
           {
             id: '1_1_1',
-            text: 'Video Players',
+            text: '組織1-1-1',
             items: [
               {
                 id: '1_1_1_1',
-                text: 'HD Video Player',
+                text: '組織1-1-1-1',
                 price: 220,
               },
               {
                 id: '1_1_1_2',
-                text: 'SuperHD Video Player',
+                text: '組織1-1-1-2',
                 price: 270,
               },
             ],
           },
           {
             id: '1_1_2',
-            text: 'Televisions',
+            text: '組織1-1-2',
             items: [
               {
                 id: '1_1_2_1',
-                text: 'SuperLCD 42',
+                text: '組織1-1-2-1',
                 price: 1200,
               },
               {
                 id: '1_1_2_2',
-                text: 'SuperLED 42',
+                text: '組織1-1-2-2',
                 price: 1450,
               },
               {
                 id: '1_1_2_3',
-                text: 'SuperLED 50',
+                text: '組織1-1-2-3',
                 price: 1600,
               },
               {
                 id: '1_1_2_4',
-                text: 'SuperLCD 55',
+                text: '組織1-1-2-4',
                 price: 1350,
               },
               {
                 id: '1_1_2_5',
-                text: 'SuperLCD 70',
+                text: '組織1-1-2-5',
                 price: 4000,
               },
             ],
           },
           {
             id: '1_1_3',
-            text: 'Monitors',
+            text: '組織1-1-3',
             items: [
               {
                 id: '1_1_3_1',
-                text: '19"',
+                text: '組織1-1-3-1',
                 items: [
                   {
                     id: '1_1_3_1_1',
-                    text: 'DesktopLCD 19',
+                    text: '組織1-1-3-1-1',
                     price: 160,
                   },
                 ],
               },
               {
                 id: '1_1_3_2',
-                text: '21"',
+                text: '組織1-1-3-2',
                 items: [
                   {
                     id: '1_1_3_2_1',
-                    text: 'DesktopLCD 21',
+                    text: '組織1-1-3-2-1',
                     price: 170,
                   },
                   {
                     id: '1_1_3_2_2',
-                    text: 'DesktopLED 21',
+                    text: '組織1-1-3-2-2',
                     price: 175,
                   },
                 ],
@@ -123,16 +124,16 @@ const organization: OrganizationUnit[] = [
           },
           {
             id: '1_1_4',
-            text: 'Projectors',
+            text: '組織1-1-4',
             items: [
               {
                 id: '1_1_4_1',
-                text: 'Projector Plus',
+                text: '組織1-1-4-1',
                 price: 550,
               },
               {
                 id: '1_1_4_2',
-                text: 'Projector PlusHD',
+                text: '組織1-1-4-2',
                 price: 750,
               },
             ],
@@ -141,36 +142,36 @@ const organization: OrganizationUnit[] = [
       },
       {
         id: '1_2',
-        text: 'Braeburn',
+        text: '組織1-2',
         items: [
           {
             id: '1_2_1',
-            text: 'Video Players',
+            text: '組織1-2-1',
             items: [
               {
                 id: '1_2_1_1',
-                text: 'HD Video Player',
+                text: '組織1-2-1-1',
                 price: 240,
               },
               {
                 id: '1_2_1_2',
-                text: 'SuperHD Video Player',
+                text: '組織1-2-1-2',
                 price: 300,
               },
             ],
           },
           {
             id: '1_2_2',
-            text: 'Televisions',
+            text: '組織1-2-2',
             items: [
               {
                 id: '1_2_2_1',
-                text: 'SuperPlasma 50',
+                text: '組織1-2-2-1',
                 price: 1800,
               },
               {
                 id: '1_2_2_2',
-                text: 'SuperPlasma 65',
+                text: '組織1-2-2-2',
                 price: 3500,
               },
             ],
@@ -212,7 +213,7 @@ const organization: OrganizationUnit[] = [
       },
       {
         id: '1_3',
-        text: 'E-Mart',
+        text: '組織1-3',
         items: [
           {
             id: '1_3_1',
@@ -262,7 +263,7 @@ const organization: OrganizationUnit[] = [
       },
       {
         id: '1_4',
-        text: 'Walters',
+        text: '組織1-4',
         items: [
           {
             id: '1_4_1',
@@ -431,11 +432,16 @@ const cards: Card[] = [
 
 let s = 123456789;
 
+export type SelectedMember = { id: number; name: string } | null;
+export type SelectedOrgNode = { id: string; name: string } | null;
+
 @Injectable({
   providedIn: 'root',
 })
 export class IndexService {
-  showOrgSelect = false;
+  selectedMember: SelectedMember = null;
+
+  selectedOrgNode: SelectedOrgNode = null;
 
   constructor() {}
 

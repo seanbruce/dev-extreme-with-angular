@@ -1,68 +1,130 @@
-<div class="page-container">
-  <div *ngIf="service.showOrgSelect; else memberSelect">
-    <h3 class="organization-selector-header header">組織單位</h3>
+<dx-drawer
+  template="template"
+  openedStateMode="overlap"
+  [animationDuration]="150"
+  [(opened)]="isDrawerOpen"
+>
+  <div
+    class="h-56 bg-white"
+    *dxTemplate="let data of 'template'"
+    style="width: 256px"
+  >
+    <div class="flex items-center mb-4">
+      <h3 class="mb-0 text-slate-600 font-bold">選擇組織單位</h3>
+      <dx-button
+        class="ml-auto [&_.dx-button-content]:p-0.5 [&_.dx-button-content]:text-xs [&_.dx-button-content]:font-bold"
+        stylingMode="text"
+        text="返回"
+        (onClick)="isDrawerOpen = false"
+      ></dx-button>
+    </div>
     <dx-tree-view
       class="organization-selector"
+      searchMode="contains"
+      showCheckBoxesMode="none"
+      selectionMode="single"
+      [height]="containerHeight"
       [items]="organization"
-      [width]="300"
       [searchEnabled]="true"
       [useNativeScrolling]="false"
-      searchMode="contains"
+      [selectByClick]="true"
+      [selectNodesRecursive]="false"
+      (onSelectionChanged)="treeViewSelectionChanged($event)"
+      (onContentReady)="treeViewContentReady($event)"
     ></dx-tree-view>
   </div>
-  <ng-template #memberSelect>
-    <div>
-      <h3 class="organization-selector-header header">人員</h3>
-    </div>
-  </ng-template>
 
-  <div>
-    <dx-data-grid
-      id="gridContainer"
-      [customizeColumns]="customizeColumns"
-      [dataSource]="dataSource"
-      keyExpr="id"
-      [showBorders]="true"
-    >
-      <dxo-toolbar>
-        <dxi-item location="before">
-          <div *dxTemplate>
-            <h3 class="header member-table-header">[xx組織]成員</h3>
-          </div>
-        </dxi-item>
-        <dxi-item location="after">
-          <div *dxTemplate>
-            <dx-button text="創建成員" width="136"> </dx-button>
-          </div>
-        </dxi-item>
-        <dxi-item name="searchPanel"></dxi-item>
-      </dxo-toolbar>
-      <dxo-search-panel [visible]="true"></dxo-search-panel>
-      <dxo-scrolling rowRenderingMode="virtual"> </dxo-scrolling>
-      <dxo-paging [pageSize]="10"> </dxo-paging>
-      <dxo-pager
-        [visible]="true"
-        allowedPageSizes
-        displayMode="full"
-        [showPageSizeSelector]="true"
-        [showInfo]="true"
-        [showNavigationButtons]="true"
-      >
-      </dxo-pager>
-    </dx-data-grid>
-    <hr />
-    <div class="right-part-bottom">
-      <div>
-        <div>
-          <h3 class="header">[xx成員]持有卡片</h3>
-        </div>
-        <dx-list
-          [width]="400"
-          [dataSource]="cards"
-          displayExpr="Name"
-          [allowItemDeleting]="true"
-        ></dx-list>
+  <div class="flex gap-4 h-full" #containerElmRef>
+    <div class="w-64 shrink-0">
+      <div class="flex items-center mb-4">
+        <h3 class="m-0 text-slate-600 font-bold truncate">
+          人員列表【{{
+            service.selectedOrgNode ? service.selectedOrgNode.name : "所有組織"
+          }}】
+        </h3>
+        <dx-button
+          class="ml-auto [&_.dx-button-content]:p-0.5 [&_.dx-button-content]:text-xs [&_.dx-button-content]:font-bold"
+          stylingMode="text"
+          [text]="service.selectedOrgNode ? '變更組織' : '選擇組織'"
+          (onClick)="isDrawerOpen = true"
+        ></dx-button>
       </div>
+      <dx-list
+        keyExpr="id"
+        selectionMode="single"
+        [height]="containerHeight"
+        [searchEnabled]="true"
+        [dataSource]="dataSource"
+        [displayExpr]="memberDisplayExpr"
+        [searchExpr]="['lastName', 'firstName']"
+        [selectedItemKeys]="
+          service.selectedMember ? [service.selectedMember.id] : []
+        "
+        (onSelectionChanged)="updateSelectedMember($event)"
+      ></dx-list>
     </div>
+    <div *ngIf="service.selectedMember; else noMemberSelected" class="w-full">
+      <div class="mb-5">Member：{{ service.selectedMember.name }}</div>
+      <dx-tab-panel
+        #tabPanel
+        [dataSource]="tabPanals"
+        [selectedIndex]="0"
+        [loop]="false"
+      >
+        <div *dxTemplate="let tab of 'title'">
+          <span>{{ tab.name }}</span>
+        </div>
+        <div *dxTemplate="let tab of 'item'" class="p-6">
+          <ng-container [ngSwitch]="tab.id">
+            <!-- the same view can be shown in more than one case -->
+            <ng-container *ngSwitchCase="'1'">
+              <dx-data-grid
+                id="gridContainer"
+                [customizeColumns]="customizeColumns"
+                [dataSource]="cards"
+                keyExpr="ID"
+                [showBorders]="true"
+              >
+                <dxo-editing
+                  mode="popup"
+                  [allowUpdating]="true"
+                  [allowAdding]="true"
+                  [allowDeleting]="true"
+                >
+                </dxo-editing>
+                <dxo-toolbar>
+                  <dxi-item location="before"> </dxi-item>
+                  <dxi-item location="after">
+                    <div *dxTemplate>
+                      <dx-button text="創建卡片" width="136"> </dx-button>
+                    </div>
+                  </dxi-item>
+                  <dxi-item name="searchPanel"></dxi-item>
+                </dxo-toolbar>
+                <dxo-search-panel [visible]="true"></dxo-search-panel>
+                <dxo-scrolling rowRenderingMode="virtual"> </dxo-scrolling>
+                <dxo-paging [pageSize]="10"> </dxo-paging>
+                <dxo-pager
+                  [visible]="true"
+                  allowedPageSizes
+                  displayMode="full"
+                  [showPageSizeSelector]="true"
+                  [showInfo]="true"
+                  [showNavigationButtons]="true"
+                >
+                </dxo-pager>
+              </dx-data-grid>
+            </ng-container>
+            <ng-container *ngSwitchCase="'2'">2</ng-container>
+            <ng-container *ngSwitchCase="'3'">3</ng-container>
+          </ng-container>
+        </div>
+      </dx-tab-panel>
+    </div>
+    <ng-template #noMemberSelected>
+      <div class="flex grow">
+        <p class="m-auto text-slate-500">Please Select Member from List.</p>
+      </div>
+    </ng-template>
   </div>
-</div>
+</dx-drawer>
